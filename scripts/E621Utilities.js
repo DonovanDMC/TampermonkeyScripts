@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.4
+// @version      1.0.5
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
 // @icon         https://www.google.com/s2/favicons?domain=e621.net
 // @grant        none
-// @updateURL    https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/E621Utilities.js
-// @downloadURL  https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/E621Utilities.js
+// @updateURL    https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/E621Utilities.js
+// @downloadURL  https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/E621Utilities.js
 // ==/UserScript==
 
 /* md5 script */
