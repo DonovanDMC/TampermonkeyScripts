@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.6
+// @version      1.0.7
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -262,7 +262,7 @@ class E621Utilities {
 		if (!q.page) q.page = 1;
 		q.page++;
 		if (p) q.page = p;
-		q.lastEmpty = Number(q.lastEmpty) || 1;
+		q.lastEmpty = (Number(q.lastEmpty) || 0) + 1;
 		if (q.lastEmpty > 3) return alert("More than 3 redirects, not continuing.");
 		window.location.href = `${window.location.pathname}?${Object.entries(q).map(([a, b]) => `${a}=${b}`).join("&")}`;
 	}
