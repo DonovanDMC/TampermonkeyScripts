@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.11
+// @version      1.0.12
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -242,15 +242,17 @@ class E621Utilities {
 	static async hide() {
 		const c = confirm("Are you sure you want to hide this post?");
 		if (c === false) return alert("Cancelled.");
-		const { q: tags } = this.getQuery();
-		const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
-		if (!tags) return alert("error.2");
-		if (!id) return alert("error.3");
-		return fetch(`https://e621-hide.local/${md5(decodeURIComponent(tags || "no-tags"))}/${id}`, {
-			method: "PUT"
-		}).then(res => {
-			if (res.status !== 204) alert("non-204");
-		}).catch(alert);
+		else {
+			const { q: tags } = this.getQuery();
+			const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
+			if (!tags) return alert("error.2");
+			if (!id) return alert("error.3");
+			return fetch(`https://e621-hide.local/${md5(decodeURIComponent(tags || "no-tags"))}/${id}`, {
+				method: "PUT"
+			}).then(res => {
+				if (res.status !== 204) alert("non-204");
+			}).catch(alert);
+		}
 	}
 
 	static enforceConsistentSpacing() {
