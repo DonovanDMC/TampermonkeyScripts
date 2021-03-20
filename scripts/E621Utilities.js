@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.10
+// @version      1.0.11
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -169,7 +169,7 @@ class E621Utilities {
 				}
 
 				case "Digit7": {
-					this.getElement("EDIT_REASON").value = "Penis & penis are not immediately visible.";
+					this.getElement("EDIT_REASON").value = "Penis & balls are not immediately visible.";
 					this.removeTags("penis", "genitals", "big_penis", "hyper_penis", "hyper_genitalia", "penis", "genitals", "big_penis", "hyper_penis");
 					break;
 				}
