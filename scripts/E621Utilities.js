@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.21
+// @version      1.0.22
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -330,5 +330,5 @@ document.addEventListener("DOMContentLoaded", () => {
 	} catch (e) { }
 	setTimeout(() => {
 		if (document.hidden === false) E621Utilities.load();
-	}, 2e3);
+	}, 500);
 });
