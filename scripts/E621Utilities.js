@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.7
+// @version      1.0.8
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -81,7 +81,7 @@ class E621Utilities {
 
 		if (this.REGEX.POST.test(window.location.pathname)) {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.hide().then(() => alert(`Done.`))">Hide Post</a></li>';
+			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide().then(() => alert(`Done.`))">Hide Post</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(1)">1 - Explicit Bulge</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
@@ -191,7 +191,7 @@ class E621Utilities {
 		});
 	}
 
-	static async openAllPosts(t) {
+	static async openAllPosts() {
 		for (const e of this.getElement("POSTS")) {
 			const w = window.open(`${e.querySelector("a").href}&p=${this.getElement("POSTS").indexOf(e) + 1}-${this.getElement("POSTS").length}`);
 			w.blur();
@@ -219,9 +219,7 @@ class E621Utilities {
 	}
 
 	static async getHideList() {
-		const { tags } = this.getQuery();
-		if (!tags) return alert("error.1");
-		return fetch(`https://e621-hide.local/${md5(decodeURIComponent(tags || "no-tags"))}`, {
+		return fetch("https://e621-hide.local/", {
 			method: "GET"
 		}).then(res => {
 			if (res.status !== 200) {
