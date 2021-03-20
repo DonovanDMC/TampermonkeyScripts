@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.8
+// @version      1.0.9
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -33,6 +33,7 @@ class E621Utilities {
 		this.handle503();
 		this.addLoaded();
 		this.addNotes();
+		this.makeHeaderSticky();
 		if (this.REGEX.POST_LIST.test(window.location.pathname)) {
 			this.getHideList().then(v => {
 				this.hidePosts([...v, ...this.HIDE_LIST]);
@@ -69,6 +70,7 @@ class E621Utilities {
 			case "SAFE": return document.querySelector("input[type=radio][value=s]");
 			case "ABOUT": return document.querySelector("textarea[name='user[profile_about]']");
 			case "EDIT": return document.querySelector("a#post-edit-link");
+			case "HEADER": return document.querySelector("header#top");
 			default: return;
 		}
 	}
@@ -97,6 +99,12 @@ class E621Utilities {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-7"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(7)">7 - 5 & 6</a></li>';
 		}
+	}
+
+	static makeHeaderSticky() {
+		this.getElement("HEADER").style.position = "sticky";
+
+		this.getElement("HEADER").style.top = "0";
 	}
 
 	static hidePosts(p) {
