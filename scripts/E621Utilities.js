@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.17
+// @version      1.0.18
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -322,7 +322,6 @@ class E621Utilities {
 
 window.E621Utilities = E621Utilities;
 
-window.addEventListener("load", E621Utilities.load.bind(E621Utilities));
 document.addEventListener("visibilitychange", () => {
 	if (document.hidden === false) E621Utilities.load();
 });
