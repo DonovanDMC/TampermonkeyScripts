@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.23
+// @version      1.0.24
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -187,6 +187,11 @@ class E621Utilities {
 					break;
 				}
 
+				case "Digit0": {
+					this.hide(false);
+					break;
+				}
+
 				case "Numpad1": {
 					this.getElement("EXPLICIT").click();
 					break;
@@ -199,11 +204,6 @@ class E621Utilities {
 
 				case "Numpad3": {
 					this.getElement("SAFE").click();
-					break;
-				}
-
-				case "KeyH": {
-					this.hide(false);
 					break;
 				}
 				default: return;
