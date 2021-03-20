@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.12
+// @version      1.0.13
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -17,7 +17,7 @@ scr.src = "https://www.myersdaily.org/joseph/javascript/md5.js";
 document.querySelector("head").appendChild(scr);
 
 try {
-	document.querySelector("nav#nav").querySelectorAll("menu")[1].innerHTML += '<li class="rm">|</li><li id="subnav-notloaded"><a href="javascript:window.location.reload()">Not Loaded</a></li>';
+	document.querySelector("nav#nav").querySelectorAll("menu")[1].innerHTML += '<li class="rm">|</li><li id="subnav-notloaded"><a href="javascript:E621Utilities.load()">Not Loaded</a></li>';
 } catch (e) { }
 class E621Utilities {
 	static HIDE_LIST = [];
@@ -83,7 +83,7 @@ class E621Utilities {
 
 		if (this.REGEX.POST.test(window.location.pathname)) {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide().then(() => alert(`Done.`))">Hide Post</a></li>';
+			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide()">Hide Post</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(1)">1 - Explicit Bulge</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
@@ -188,6 +188,11 @@ class E621Utilities {
 					this.getElement("SAFE").click();
 					break;
 				}
+
+				case "KeyH": {
+					this.hide();
+					break;
+				}
 				default: return;
 			}
 		});
@@ -239,8 +244,8 @@ class E621Utilities {
 
 	}
 
-	static async hide() {
-		const c = confirm("Are you sure you want to hide this post?");
+	static async hide(force = false) {
+		const c = force || confirm("Are you sure you want to hide this post?");
 		if (c === false) return alert("Cancelled.");
 		else {
 			const { q: tags } = this.getQuery();
@@ -250,7 +255,8 @@ class E621Utilities {
 			return fetch(`https://e621-hide.local/${md5(decodeURIComponent(tags || "no-tags"))}/${id}`, {
 				method: "PUT"
 			}).then(res => {
-				if (res.status !== 204) alert("non-204");
+				if (res.status !== 204) return alert("non-204");
+				alert("Done.");
 			}).catch(alert);
 		}
 	}
