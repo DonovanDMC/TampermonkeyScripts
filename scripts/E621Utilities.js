@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.22
+// @version      1.0.23
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -120,7 +120,7 @@ class E621Utilities {
 		const prev = this.POSTS_PER_PAGE * (p - 1);
 		const cur = this.getElement("POSTS").length;
 		const hid = this.POSTS_PER_PAGE - cur;
-		const next = Number(Array.from(this.getElement("PAGINATOR").querySelectorAll("li.numbered-page")).slice(-1)[0].innerText);
+		const next = Number(Array.from(this.getElement("PAGINATOR").querySelectorAll("li.numbered-page")).slice(-1)[0].innerText) - p;
 		const pag = this.POSTS_PER_PAGE * next;
 		this.getElement("MENU").innerHTML += '<li>|</li>';
 		this.getElement("MENU").innerHTML += `<li id="previous-posts"><a href="javascript:void(0)">${prev} Previous Post${prev === 1 ? "" : "s"} (${(p - 1)} Page${(p - 1) === 1 ? "" : "s"})</a></li>`;
