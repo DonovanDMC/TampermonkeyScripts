@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.14
+// @version      1.0.15
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -20,6 +20,7 @@ try {
 	document.querySelector("nav#nav").querySelectorAll("menu")[1].innerHTML += '<li class="rm">|</li><li id="subnav-notloaded"><a href="javascript:E621Utilities.load()">Not Loaded</a></li>';
 } catch (e) { }
 class E621Utilities {
+	static POSTS_PER_PAGE = 75;
 	static HIDE_LIST = [];
 	static DONE = false;
 	static REGEX = {
@@ -38,6 +39,7 @@ class E621Utilities {
 			this.getHideList().then(v => {
 				this.hidePosts([...v, ...this.HIDE_LIST]);
 				this.checkEmptyPosts();
+				this.addPostCounts();
 			});
 		}
 		if (this.REGEX.POST.test(window.location.pathname)) {
@@ -71,6 +73,7 @@ class E621Utilities {
 			case "ABOUT": return document.querySelector("textarea[name='user[profile_about]']");
 			case "EDIT": return document.querySelector("a#post-edit-link");
 			case "HEADER": return document.querySelector("header#top");
+			case "PAGINATOR": return document.querySelector("div.paginator");
 			default: return;
 		}
 	}
@@ -116,8 +119,24 @@ class E621Utilities {
 				c++;
 			}
 		}
+	}
+
+	static addPostCounts() {
+		const p = this.getPage();
+		const prev = this.POSTS_PER_PAGE * (p - 1);
+		const cur = this.getElement("POSTS").length;
+		const hid = this.POSTS_PER_PAGE - cur;
+		const next = Number(Array.from(this.getElement("PAGINATOR").querySelectorAll("li.numbered-page")).slice(-1)[0].innerText);
+		const pag = this.POSTS_PER_PAGE * next;
 		this.getElement("MENU").innerHTML += '<li>|</li>';
-		this.getElement("MENU").innerHTML += `<li id="hidden-count"><a href="javascript:void(0)">${c} Hidden Post${c === 1 ? "" : "s"}</a></li>`;
+		this.getElement("MENU").innerHTML += `<li id="previous-posts"><a href="javascript:void(0)">${prev} Previous Post${prev === 1 ? "" : "s"} (${(p - 1)} Page${(p - 1) === 1 ? "" : "s"})</a></li>`;
+		this.getElement("MENU").innerHTML += '<li>|</li>';
+		this.getElement("MENU").innerHTML += `<li id="current-posts"><a href="javascript:void(0)">${cur} Current Post${cur === 1 ? "" : "s"}</a></li>`;
+		this.getElement("MENU").innerHTML += '<li>|</li>';
+		this.getElement("MENU").innerHTML += `<li id="hidden-posts"><a href="javascript:void(0)">${hid} Hidden Post${hid === 1 ? "" : "s"}</a></li>`;
+		this.getElement("MENU").innerHTML += '<li>|</li>';
+		this.getElement("MENU").innerHTML += `<li id="next-posts"><a href="javascript:void(0)">${pag} Next Post${pag === 1 ? "" : "s"} (${(next - 1)} Page${(next - 1) === 1 ? "" : "s"})</a></li>`;
+
 	}
 
 	static collapseTags() {
@@ -271,6 +290,11 @@ class E621Utilities {
 			[v.split("=")[0]]: v.split("=")[1]
 		}))
 			.reduce((a, b) => ({ ...a, ...b }), {});
+	}
+
+	static getPage() {
+		const { page } = this.getQuery();
+		return Number(page) || 1;
 	}
 
 	static changePage(p) {
