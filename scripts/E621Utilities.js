@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.20
+// @version      1.0.21
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -12,14 +12,7 @@
 // @run-at       document-start
 // ==/UserScript==
 
-/* md5 script */
-const scr = document.createElement("script");
-scr.src = "https://www.myersdaily.org/joseph/javascript/md5.js";
-document.querySelector("head").appendChild(scr);
 
-try {
-	document.querySelector("nav#nav").querySelectorAll("menu")[1].innerHTML += '<li class="rm">|</li><li id="subnav-notloaded"><a href="javascript:E621Utilities.load()">Not Loaded</a></li>';
-} catch (e) { }
 class E621Utilities {
 	static POSTS_PER_PAGE = 75;
 	static HIDE_LIST = [];
@@ -326,7 +319,15 @@ window.E621Utilities = E621Utilities;
 document.addEventListener("visibilitychange", () => {
 	if (document.hidden === false) E621Utilities.load();
 });
-document.addEventListener("load", () => {
+document.addEventListener("DOMContentLoaded", () => {
+	/* md5 script */
+	const scr = document.createElement("script");
+	scr.src = "https://www.myersdaily.org/joseph/javascript/md5.js";
+	document.querySelector("head").appendChild(scr);
+
+	try {
+		document.querySelector("nav#nav").querySelectorAll("menu")[1].innerHTML += '<li class="rm">|</li><li id="subnav-notloaded"><a href="javascript:E621Utilities.load()">Not Loaded</a></li>';
+	} catch (e) { }
 	setTimeout(() => {
 		if (document.hidden === false) E621Utilities.load();
 	}, 2e3);
