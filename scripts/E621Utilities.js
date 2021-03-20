@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.13
+// @version      1.0.14
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -83,7 +83,7 @@ class E621Utilities {
 
 		if (this.REGEX.POST.test(window.location.pathname)) {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide()">Hide Post</a></li>';
+			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide(true)">Hide Post</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(1)">1 - Explicit Bulge</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
@@ -190,7 +190,7 @@ class E621Utilities {
 				}
 
 				case "KeyH": {
-					this.hide();
+					this.hide(false);
 					break;
 				}
 				default: return;
