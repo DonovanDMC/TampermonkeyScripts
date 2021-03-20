@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.15
+// @version      1.0.17
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -225,7 +225,7 @@ class E621Utilities {
 
 	static async openAllPosts() {
 		for (const e of this.getElement("POSTS")) {
-			const w = window.open(`${e.querySelector("a").href}&p=${this.getElement("POSTS").indexOf(e) + 1}-${this.getElement("POSTS").length}`);
+			const w = window.open(`${e.querySelector("a").href}&current=${this.getElement("POSTS").indexOf(e) + 1}&total=${this.getElement("POSTS").length}`);
 			w.blur();
 			window.focus();
 			await new Promise((a, b) => w.onload = a);
