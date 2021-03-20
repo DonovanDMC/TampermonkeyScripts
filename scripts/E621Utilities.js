@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.9
+// @version      1.0.10
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -240,6 +240,8 @@ class E621Utilities {
 	}
 
 	static async hide() {
+		const c = confirm("Are you sure you want to hide this post?");
+		if (c === false) return alert("Cancelled.");
 		const { q: tags } = this.getQuery();
 		const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
 		if (!tags) return alert("error.2");
