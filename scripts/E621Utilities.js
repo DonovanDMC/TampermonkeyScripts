@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.29
+// @version      1.0.31
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -283,7 +283,7 @@ class E621Utilities {
 			if (!tags) return alert("error.2");
 			if (!id) return alert("error.3");
 			// padding isn't required, and it's easier to just toss it out
-			return fetch(`https://e621-hide.local/${encodeURICompoent(btoa(decodeURIComponent(tags || "no-tags").trim()).replace(/=/g, ""))}/${id}`, {
+			return fetch(`https://e621-hide.local/${encodeURIComponent(btoa(decodeURIComponent(tags || "no-tags").trim()).replace(/=/g, ""))}/${id}`, {
 				method: "PUT"
 			}).then(res => {
 				if (res.status !== 204) return alert("non-204");
@@ -294,7 +294,7 @@ class E621Utilities {
 
 	static enforceConsistentSpacing() {
 		const n = window.location.search.replace(/\+/g, "%20");
-		if (window.location.search !== n) window.location.href = `${window.location.pathname}${n}`;
+		if (window.location.search !== n) window.history.replaceState(undefined, document.title, `${window.location.pathname}${n}`);
 	}
 
 	static getQuery() {
@@ -323,7 +323,7 @@ class E621Utilities {
 		const q = this.getQuery();
 		if (!q.lastEmpty) return;
 		delete q.lastEmpty;
-		window.location.href = `${window.location.pathname}?${Object.entries(q).map(([a, b]) => `${a}=${b}`).join("&")}`;
+		window.history.replaceState(undefined, document.title, `${window.location.pathname}?${Object.entries(q).map(([a, b]) => `${a}=${b}`).join("&")}`);
 	}
 
 	static checkEmptyPosts() {
