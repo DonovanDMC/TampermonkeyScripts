@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.26
+// @version      1.0.27
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -115,7 +115,10 @@ class E621Utilities {
 	static markLockedPosts(p) {
 		for (const h of p) {
 			const e = document.querySelector(`article#post_${h}`);
-			if (e) e.style.border = "1px solid red";
+			if (e) {
+				e.style.border = "1px solid red";
+				e.dataset.locked = "true";
+			}
 		}
 	}
 
@@ -133,7 +136,7 @@ class E621Utilities {
 		this.getElement("MENU").innerHTML += '<li>|</li>';
 		this.getElement("MENU").innerHTML += `<li id="hidden-posts"><a href="javascript:void(0)">${hid} Hidden Post${hid === 1 ? "" : "s"}</a></li>`;
 		this.getElement("MENU").innerHTML += '<li>|</li>';
-		this.getElement("MENU").innerHTML += `<li id="next-posts"><a href="javascript:void(0)">${pag} Next Post${pag === 1 ? "" : "s"} (${(next - 1)} Page${(next - 1) === 1 ? "" : "s"})</a></li>`;
+		this.getElement("MENU").innerHTML += `<li id="next-posts"><a href="javascript:void(0)">${pag} Next Post${pag === 1 ? "" : "s"} (${next} Page${(next - 1) === 1 ? "" : "s"})</a></li>`;
 
 	}
 
@@ -228,6 +231,7 @@ class E621Utilities {
 
 	static async openAllPosts() {
 		for (const e of this.getElement("POSTS")) {
+			if (e.dataset.locked === "true") continue;
 			const w = window.open(`${e.querySelector("a").href}&current=${this.getElement("POSTS").indexOf(e) + 1}&total=${this.getElement("POSTS").length}`);
 			w.blur();
 			window.focus();
