@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.24
+// @version      1.0.25
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -31,7 +31,8 @@ class E621Utilities {
 		this.makeHeaderSticky();
 		if (this.REGEX.POST_LIST.test(window.location.pathname)) {
 			this.getHideList().then(v => {
-				this.hidePosts([...v, ...this.HIDE_LIST]);
+				this.hidePosts([...v.hidden, ...this.HIDE_LIST]);
+				this.markLockedPosts(v.locked);
 				this.checkEmptyPosts();
 				this.addPostCounts();
 			});
@@ -105,13 +106,16 @@ class E621Utilities {
 	}
 
 	static hidePosts(p) {
-		let c = 0;
 		for (const h of p) {
 			const e = document.querySelector(`article#post_${h}`);
-			if (e) {
-				e.parentNode.removeChild(e);
-				c++;
-			}
+			if (e) e.parentNode.removeChild(e);
+		}
+	}
+
+	static markLockedPosts(p) {
+		for (const h of p) {
+			const e = document.querySelector(`article#post_${h}`);
+			if (e) e.style.border = "1px solid red";
 		}
 	}
 
@@ -187,6 +191,11 @@ class E621Utilities {
 					break;
 				}
 
+				case "Digit9": {
+					this.markLocked();
+					break;
+				}
+
 				case "Digit0": {
 					this.hide(false);
 					break;
@@ -244,6 +253,10 @@ class E621Utilities {
 		document.dispatchEvent(new KeyboardEvent("keydown", { code }));
 	}
 
+	/**
+	 * 
+	 * @returns {Promise<{ hidden: number[]; locked: number[]; }>}
+	 */
 	static async getHideList() {
 		return fetch("https://e621-hide.local/", {
 			method: "GET"
@@ -251,7 +264,7 @@ class E621Utilities {
 			if (res.status !== 200) {
 				if (res.status === 404) return;
 				alert("non-200/404");
-			} else return res.json().then(v => this.HIDE_LIST = v);
+			} else return res.json();
 			// this.hidePosts()
 		}).catch(alert);
 
@@ -311,6 +324,23 @@ class E621Utilities {
 	static checkEmptyPosts() {
 		if (this.getElement("POSTS").length === 0) this.changePage();
 		else this.resetLastEmpty();
+	}
+
+	static markLocked() {
+		const c = force || confirm("Are you sure you want to hide this post?");
+		if (c === false) return alert("Cancelled.");
+		else {
+			const { q: tags } = this.getQuery();
+			const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
+			if (!tags) return alert("error.2");
+			if (!id) return alert("error.3");
+			return fetch(`https://e621-hide.local/locked/${id}`, {
+				method: "PUT"
+			}).then(res => {
+				if (res.status !== 204) return alert("non-204");
+				alert("Done.");
+			}).catch(alert);
+		}
 	}
 }
 
