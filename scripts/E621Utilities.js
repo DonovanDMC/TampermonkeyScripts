@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.27
+// @version      1.0.28
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -258,7 +258,7 @@ class E621Utilities {
 	}
 
 	/**
-	 * 
+	 *
 	 * @returns {Promise<{ hidden: number[]; locked: number[]; }>}
 	 */
 	static async getHideList() {
@@ -282,7 +282,8 @@ class E621Utilities {
 			const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
 			if (!tags) return alert("error.2");
 			if (!id) return alert("error.3");
-			return fetch(`https://e621-hide.local/${md5(decodeURIComponent(tags || "no-tags"))}/${id}`, {
+			// padding isn't required, and it's easier to just toss it out
+			return fetch(`https://e621-hide.local/${encodeURICompoent(btoa(decodeURIComponent(tags || "no-tags").trim()).replace(/=/g, ""))}/${id}`, {
 				method: "PUT"
 			}).then(res => {
 				if (res.status !== 204) return alert("non-204");
@@ -292,7 +293,7 @@ class E621Utilities {
 	}
 
 	static enforceConsistentSpacing() {
-		const n = window.location.search.replace(/%20/g, "+");
+		const n = window.location.search.replace(/\+/g, "%20");
 		if (window.location.search !== n) window.location.href = `${window.location.pathname}${n}`;
 	}
 
