@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.25
+// @version      1.0.26
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
