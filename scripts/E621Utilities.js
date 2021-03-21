@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.28
+// @version      1.0.29
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -351,11 +351,6 @@ document.addEventListener("visibilitychange", () => {
 	if (document.hidden === false) E621Utilities.load();
 });
 document.addEventListener("DOMContentLoaded", () => {
-	/* md5 script */
-	const scr = document.createElement("script");
-	scr.src = "https://www.myersdaily.org/joseph/javascript/md5.js";
-	document.querySelector("head").appendChild(scr);
-
 	try {
 		document.querySelector("nav#nav").querySelectorAll("menu")[1].innerHTML += '<li class="rm">|</li><li id="subnav-notloaded"><a href="javascript:E621Utilities.load()">Not Loaded</a></li>';
 	} catch (e) { }
