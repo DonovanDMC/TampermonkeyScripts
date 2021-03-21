@@ -327,20 +327,16 @@ class E621Utilities {
 	}
 
 	static markLocked() {
-		const c = force || confirm("Are you sure you want to hide this post?");
-		if (c === false) return alert("Cancelled.");
-		else {
-			const { q: tags } = this.getQuery();
-			const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
-			if (!tags) return alert("error.2");
-			if (!id) return alert("error.3");
-			return fetch(`https://e621-hide.local/locked/${id}`, {
-				method: "PUT"
-			}).then(res => {
-				if (res.status !== 204) return alert("non-204");
-				alert("Done, locked.");
-			}).catch(alert);
-		}
+		const { q: tags } = this.getQuery();
+		const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
+		if (!tags) return alert("error.2");
+		if (!id) return alert("error.3");
+		return fetch(`https://e621-hide.local/locked/${id}`, {
+			method: "PUT"
+		}).then(res => {
+			if (res.status !== 204) return alert("non-204");
+			alert("Done, locked.");
+		}).catch(alert);
 	}
 }
 
