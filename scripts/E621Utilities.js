@@ -282,7 +282,7 @@ class E621Utilities {
 				method: "PUT"
 			}).then(res => {
 				if (res.status !== 204) return alert("non-204");
-				alert("Done.");
+				alert("Done, hidden.");
 			}).catch(alert);
 		}
 	}
@@ -338,7 +338,7 @@ class E621Utilities {
 				method: "PUT"
 			}).then(res => {
 				if (res.status !== 204) return alert("non-204");
-				alert("Done.");
+				alert("Done, locked.");
 			}).catch(alert);
 		}
 	}
