@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.32
+// @version      1.0.33
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -81,6 +81,9 @@ class E621Utilities {
 		}
 
 		if (this.REGEX.POST.test(window.location.pathname)) {
+			// remove useless links
+			this.getElement("MENU").removeChild(document.querySelector("nav#nav menu li#subnav-hot"));
+			this.getElement("MENU").removeChild(document.querySelector("nav#nav menu li#subnav-popular"));
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide(true)">Hide Post</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
@@ -89,10 +92,10 @@ class E621Utilities {
 			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(1)">1 - Explicit Bulge</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-2"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(2)">2 - Penis Outline</a></li>';
-			/* this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(3)">3 - 1 & 2</a></li>'; */
 			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-4"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(4)">4 - Balls Outline</a></li>';
+			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(3)">3 - Balls Outline</a></li>';
+			this.getElement("MENU").innerHTML += '<li>|</li>';
+			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(3)">3 - 2 & 3</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-5"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(5)">5 - Balls not vis</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
@@ -158,42 +161,45 @@ class E621Utilities {
 			switch (ev.code) {
 				case "Digit1": {
 					this.getElement("EXPLICIT").click();
-					this.getElement("EDIT_REASON").value = "Explicit bulge.";
+					this.setEditReason("Explicit bulge.");
 					break;
 				}
 
 				case "Digit2": {
 					this.getElement("EXPLICIT").click();
-					this.getElement("EDIT_REASON").value = "Penis outline.";
+					this.setEditReason("Penis outline.");
+					this.addTags("penis_outline");
 					break;
 				}
 
-				/* case "Digit3": {
+				case "Digit3": {
 					this.getElement("EXPLICIT").click();
-					this.getElement("EDIT_REASON").value = "Explicit bulge, penis outline.";
+					this.setEditReason("Balls outline.");
+					this.addTags("balls_outline");
 					break;
-				} */
+				}
 
 				case "Digit4": {
 					this.getElement("EXPLICIT").click();
-					this.getElement("EDIT_REASON").value = "Balls outline.";
+					this.setEditReason("Balls & penis outline.");
+					this.addTags("balls_outline", "penis_outline");
 					break;
 				}
 
 				case "Digit5": {
-					this.getElement("EDIT_REASON").value = "Balls are not immediately visible.";
+					this.setEditReason("Balls are not immediately visible.");
 					this.removeTags("balls", "genitals", "backsack", "big_balls", "hyper_balls", "huge_balls", "hyper_genitalia");
 					break;
 				}
 
 				case "Digit6": {
-					this.getElement("EDIT_REASON").value = "Penis is not immediately visible.";
+					this.setEditReason("Penis is not immediately visible.");
 					this.removeTags("penis", "genitals", "big_penis", "hyper_penis", "hyper_genitalia");
 					break;
 				}
 
 				case "Digit7": {
-					this.getElement("EDIT_REASON").value = "Penis & balls are not immediately visible.";
+					this.setEditReason("Penis & balls are not immediately visible.");
 					this.removeTags("penis", "genitals", "big_penis", "hyper_penis", "hyper_genitalia", "penis", "genitals", "big_penis", "hyper_penis");
 					break;
 				}
@@ -257,8 +263,15 @@ class E621Utilities {
 		this.getElement("EDIT").click();
 	}
 
+	static setEditReason(e) {
+		this.getElement("EDIT_REASON").value = e;
+	}
+
 	static removeTags(...tags) {
 		this.getElement("TAGS").value = this.getElement("TAGS").value.trim().split("\n").map(v => v.trim().split(/\s/).filter(j => !tags.includes(j)).join(" ")).join("\n");
+	}
+	static addTags(...tags) {
+		this.getElement("TAGS").value = this.getElement("TAGS").value.split("\n").push(tags.join(" ")).join("\n");
 	}
 
 	static manuallyTriggerQuickEdit(e) {
