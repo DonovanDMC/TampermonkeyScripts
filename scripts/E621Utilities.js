@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.35
+// @version      1.0.36
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -87,7 +87,7 @@ class E621Utilities {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide(true)">Hide Post</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.toggleQuickEditss()">QE: <span id="t">Enabled</span></a></li>';
+			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.toggleQuickEdits()">QE: <span id="t">Enabled</span></a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(1)">1 - Explicit Bulge</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
