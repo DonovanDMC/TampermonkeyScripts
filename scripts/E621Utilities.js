@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.36
+// @version      1.0.37
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -251,7 +251,14 @@ class E621Utilities {
 			const w = window.open(`${e.querySelector("a").href}&current=${this.getElement("POSTS").indexOf(e) + 1}&total=${this.getElement("POSTS").length}`);
 			w.blur();
 			window.focus();
-			await new Promise((a, b) => w.onload = a);
+			await new Promise((a, b) => {
+				window.openTimeout = setTimeout(a, 5e3);
+				w.addEventListener("load", () => {
+					clearTimeout(window.openTimeout);
+					a();
+				});
+			});
+			delete window.openTimeout;
 		}
 	}
 
