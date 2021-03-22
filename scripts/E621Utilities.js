@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.31
+// @version      1.0.32
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -17,6 +17,7 @@ class E621Utilities {
 	static POSTS_PER_PAGE = 75;
 	static HIDE_LIST = [];
 	static DONE = false;
+	static KEYBINDS_DISABLED = false;
 	static REGEX = {
 		POST_LIST: /^\/posts$/,
 		POST: /^\/posts\/[0-9]{2,}$/,
@@ -83,11 +84,13 @@ class E621Utilities {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide(true)">Hide Post</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
+			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.toggleQuickEdits()">QE: <span id="t">Enabled</span></a></li>';
+			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(1)">1 - Explicit Bulge</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-2"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(2)">2 - Penis Outline</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(3)">3 - 1 & 2</a></li>';
+			/* this.getElement("MENU").innerHTML += '<li>|</li>';
+			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(3)">3 - 1 & 2</a></li>'; */
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-4"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(4)">4 - Balls Outline</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
@@ -151,6 +154,7 @@ class E621Utilities {
 
 	static setupQuickEdit() {
 		document.addEventListener("keydown", (ev) => {
+			if (this.KEYBINDS_DISABLED && ev.code !== "NumpadDecimal") return;
 			switch (ev.code) {
 				case "Digit1": {
 					this.getElement("EXPLICIT").click();
@@ -164,11 +168,11 @@ class E621Utilities {
 					break;
 				}
 
-				case "Digit3": {
+				/* case "Digit3": {
 					this.getElement("EXPLICIT").click();
 					this.getElement("EDIT_REASON").value = "Explicit bulge, penis outline.";
 					break;
-				}
+				} */
 
 				case "Digit4": {
 					this.getElement("EXPLICIT").click();
@@ -218,6 +222,12 @@ class E621Utilities {
 					this.getElement("SAFE").click();
 					break;
 				}
+
+				case "NumpadDecimal": {
+					this.toggleQuickEdit();
+					break;
+				}
+
 				default: return;
 			}
 		});
@@ -342,6 +352,13 @@ class E621Utilities {
 			if (res.status !== 204) return alert("non-204");
 			alert("Done, locked.");
 		}).catch(alert);
+	}
+
+	/** @param {boolean} [override] */
+	static toggleQuickEdit(override) {
+		override = override ?? !this.KEYBINDS_DISABLED;
+		this.KEYBINDS_DISABLED = override;
+		this.getElement("MENU").querySelector("li a span#t").innerText = this.KEYBINDS_DISABLED ? "Disabled" : "Enabled";
 	}
 }
 
