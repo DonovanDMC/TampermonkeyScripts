@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.37
+// @version      1.0.38
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -226,6 +226,11 @@ class E621Utilities {
 
 				case "Numpad3": {
 					this.getElement("SAFE").click();
+					break;
+				}
+
+				case "Numpad0": {
+					document.querySelector("div.edit-submit.input input[name=commit]").click();
 					break;
 				}
 
