@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.33
+// @version      1.0.34
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -271,7 +271,7 @@ class E621Utilities {
 		this.getElement("TAGS").value = this.getElement("TAGS").value.trim().split("\n").map(v => v.trim().split(/\s/).filter(j => !tags.includes(j)).join(" ")).join("\n");
 	}
 	static addTags(...tags) {
-		this.getElement("TAGS").value = this.getElement("TAGS").value.split("\n").push(tags.join(" ")).join("\n");
+		this.getElement("TAGS").value = [...this.getElement("TAGS").value.split("\n"), tags.join(" ")].join("\n");
 	}
 
 	static manuallyTriggerQuickEdit(e) {
