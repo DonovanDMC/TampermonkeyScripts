@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.38
+// @version      1.0.39
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -14,6 +14,7 @@
 
 
 class E621Utilities {
+	static BASE = "https://hide.e621.net/";
 	static POSTS_PER_PAGE = 75;
 	static HIDE_LIST = [];
 	static DONE = false;
@@ -194,7 +195,7 @@ class E621Utilities {
 
 				case "Digit6": {
 					this.setEditReason("Penis is not immediately visible.");
-					this.removeTags("penis", "genitals", "big_penis", "hyper_penis", "hyper_genitalia");
+					this.removeTags("penis", "genitals", "big_penis", "huge_penis", "hyper_penis", "hyper_genitalia", "multi_penis", "multi_genetalia", "diphallism", "flaccid");
 					break;
 				}
 
@@ -297,7 +298,7 @@ class E621Utilities {
 	 * @returns {Promise<{ hidden: number[]; locked: number[]; }>}
 	 */
 	static async getHideList() {
-		return fetch("https://e621-hide.local/", {
+		return fetch(this.BASE, {
 			method: "GET"
 		}).then(res => {
 			if (res.status !== 200) {
@@ -318,7 +319,7 @@ class E621Utilities {
 			if (!tags) return alert("error.2");
 			if (!id) return alert("error.3");
 			// padding isn't required, and it's easier to just toss it out
-			return fetch(`https://e621-hide.local/${encodeURIComponent(btoa(decodeURIComponent(tags || "no-tags").trim()).replace(/=/g, ""))}/${id}`, {
+			return fetch(`${this.BASE}${encodeURIComponent(btoa(decodeURIComponent(tags || "no-tags").trim()).replace(/=/g, ""))}/${id}`, {
 				method: "PUT"
 			}).then(res => {
 				if (res.status !== 204) return alert("non-204");
@@ -371,7 +372,7 @@ class E621Utilities {
 		const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
 		if (!tags) return alert("error.2");
 		if (!id) return alert("error.3");
-		return fetch(`https://e621-hide.local/locked/${id}`, {
+		return fetch(`${this.BASE}locked/${id}`, {
 			method: "PUT"
 		}).then(res => {
 			if (res.status !== 204) return alert("non-204");
