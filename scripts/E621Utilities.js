@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.39
+// @version      1.0.40
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -98,11 +98,15 @@ class E621Utilities {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(3)">3 - 2 & 3</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-5"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(5)">5 - Balls not vis</a></li>';
+			this.getElement("MENU").innerHTML += '<li id="digit-5"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(5)">5 - Balls nv</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-6"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(6)">6 - Penis not vis</a></li>';
+			this.getElement("MENU").innerHTML += '<li id="digit-6"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(6)">6 - Penis nv</a></li>';
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="digit-7"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(7)">7 - 5 & 6</a></li>';
+			this.getElement("MENU").innerHTML += '<li>|</li>';
+			this.getElement("MENU").innerHTML += '<li id="digit-8"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(8)">8 - Anus nv</a></li>';
+			this.getElement("MENU").innerHTML += '<li>|</li>';
+			this.getElement("MENU").innerHTML += '<li id="digit-9"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(9)">Lock</a></li>';
 		}
 	}
 
@@ -202,6 +206,12 @@ class E621Utilities {
 				case "Digit7": {
 					this.setEditReason("Penis & balls are not immediately visible.");
 					this.removeTags("penis", "genitals", "big_penis", "hyper_penis", "hyper_genitalia", "penis", "genitals", "big_penis", "hyper_penis");
+					break;
+				}
+
+				case "Digit8": {
+					this.setEditReason("Anus is not immediately visible.");
+					this.removeTags("anus", "presenting", "presenting_anus");
 					break;
 				}
 
