@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.40
+// @version      1.0.41
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -67,6 +67,7 @@ class E621Utilities {
 			case "EXPLICIT": return document.querySelector("input[type=radio][value=e]");
 			case "QUESTIONABLE": return document.querySelector("input[type=radio][value=q]");
 			case "SAFE": return document.querySelector("input[type=radio][value=s]");
+			case "RATING": return document.querySelector("span#post-rating-text");
 			case "ABOUT": return document.querySelector("textarea[name='user[profile_about]']");
 			case "EDIT": return document.querySelector("a#post-edit-link");
 			case "HEADER": return document.querySelector("header#top");
@@ -163,29 +164,30 @@ class E621Utilities {
 	static setupQuickEdit() {
 		document.addEventListener("keydown", (ev) => {
 			if (this.KEYBINDS_DISABLED && ev.code !== "NumpadDecimal") return;
+			if (ev.shiftKey) return;
 			switch (ev.code) {
 				case "Digit1": {
-					this.getElement("EXPLICIT").click();
+					if (this.getRating() !== "e") this.getElement("EXPLICIT").click();
 					this.setEditReason("Explicit bulge.");
 					break;
 				}
 
 				case "Digit2": {
-					this.getElement("EXPLICIT").click();
+					if (this.getRating() !== "e") this.getElement("EXPLICIT").click();
 					this.setEditReason("Penis outline.");
 					this.addTags("penis_outline");
 					break;
 				}
 
 				case "Digit3": {
-					this.getElement("EXPLICIT").click();
+					if (this.getRating() !== "e") this.getElement("EXPLICIT").click();
 					this.setEditReason("Balls outline.");
 					this.addTags("balls_outline");
 					break;
 				}
 
 				case "Digit4": {
-					this.getElement("EXPLICIT").click();
+					if (this.getRating() !== "e") this.getElement("EXPLICIT").click();
 					this.setEditReason("Balls & penis outline.");
 					this.addTags("balls_outline", "penis_outline");
 					break;
@@ -193,25 +195,28 @@ class E621Utilities {
 
 				case "Digit5": {
 					this.setEditReason("Balls are not immediately visible.");
-					this.removeTags("balls", "genitals", "backsack", "big_balls", "hyper_balls", "huge_balls", "hyper_genitalia");
+					this.removeTags("backsack");
+					this.removeTagsFilter((t) => ["balls", "genital"].some(v => t.indexOf(v) !== -1) && ["outline"].some(v => t.indexOf(v) === -1));
 					break;
 				}
 
 				case "Digit6": {
 					this.setEditReason("Penis is not immediately visible.");
-					this.removeTags("penis", "genitals", "big_penis", "huge_penis", "hyper_penis", "hyper_genitalia", "multi_penis", "multi_genetalia", "diphallism", "flaccid");
+					this.removeTags("diphallism", "flaccid", "poking_out", "pubes");
+					this.removeTagsFilter((t) => ["penis", "genital", "knot", "foreskin", "uncut", "circumcised"].some(v => t.indexOf(v) !== -1) && ["outline"].some(v => t.indexOf(v) === -1));
 					break;
 				}
 
 				case "Digit7": {
+					this.manuallyTriggerQuickEdit(5);
+					this.manuallyTriggerQuickEdit(6);
 					this.setEditReason("Penis & balls are not immediately visible.");
-					this.removeTags("penis", "genitals", "big_penis", "hyper_penis", "hyper_genitalia", "penis", "genitals", "big_penis", "hyper_penis");
 					break;
 				}
 
 				case "Digit8": {
 					this.setEditReason("Anus is not immediately visible.");
-					this.removeTags("anus", "presenting", "presenting_anus");
+					this.removeTags("anus", "presenting", "presenting_anus", "puffy_anus");
 					break;
 				}
 
@@ -256,8 +261,8 @@ class E621Utilities {
 
 		document.addEventListener("keyup", () => {
 			//const tt = t.value.split("\n").map(v => v.split(" ").filter(v => !["1", "2", "3"].includes(v)).join(" ")).join("\n");
-			if (["1", "2", "3", "4", "5", "6", "7"].includes(this.getElement("PARENT_ID").value)) this.getElement("PARENT_ID").value = "";
-			if (["1", "2", "3", "4", "5", "6", "7"].some(v => this.getElement("TAGS").value.trim().endsWith(v))) this.getElement("TAGS").value = this.getElement("TAGS").value.slice(0, -1);
+			if (["1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(this.getElement("PARENT_ID").value)) this.getElement("PARENT_ID").value = "";
+			if (["1", "2", "3", "4", "5", "6", "7", "8", "9"].some(v => this.getElement("TAGS").value.trim().endsWith(v))) this.getElement("TAGS").value = this.getElement("TAGS").value.slice(0, -1);
 		});
 	}
 
@@ -290,9 +295,22 @@ class E621Utilities {
 		this.getElement("EDIT_REASON").value = e;
 	}
 
+	static getRating() {
+		return this.getElement("RATING").innerText === "Safe" ? "s" : this.getElement("RATING").innerText === "Questionable" ? "q" : "e";
+	}
+
+	/** @param {Array<string>} tags */
 	static removeTags(...tags) {
+		if (Array.isArray(tags[0])) tags = [...tags[0]];
 		this.getElement("TAGS").value = this.getElement("TAGS").value.trim().split("\n").map(v => v.trim().split(/\s/).filter(j => !tags.includes(j)).join(" ")).join("\n");
 	}
+
+	/** @param {(tag: string) => boolean} f */
+	static removeTagsFilter(f) {
+		this.removeTags(...this.getElement("TAGS").value.trim().split("\n").map(v => v.trim().split(/\s/)).reduce((a, b) => a.concat(b)).filter(f));
+	}
+
+	/** @param {Array<string>} tags */
 	static addTags(...tags) {
 		this.getElement("TAGS").value = [...this.getElement("TAGS").value.split("\n"), tags.join(" ")].join("\n");
 	}
