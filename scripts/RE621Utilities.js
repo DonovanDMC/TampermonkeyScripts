@@ -7,8 +7,8 @@
 // @match        https://e621.net/*
 // @icon         https://www.google.com/s2/favicons?domain=e621.net
 // @grant        none
-// @updateURL    https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/E621Utilities.js
-// @downloadURL  https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/E621Utilities.js
+// @updateURL    https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/RE621Utilities.js
+// @downloadURL  https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/RE621Utilities.js
 // @run-at       document-start
 // ==/UserScript==
 
