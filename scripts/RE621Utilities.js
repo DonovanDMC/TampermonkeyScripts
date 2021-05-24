@@ -292,7 +292,7 @@ class E621Utilities {
 				}
 
 				case "Numpad1": {
-					this.getElement("SAFE")?.click();
+					this.getElement("EXPLICIT")?.click();
 					break;
 				}
 
@@ -302,12 +302,12 @@ class E621Utilities {
 				}
 
 				case "Numpad3": {
-					this.getElement("EXPLICIT")?.click();
+					this.getElement("SAFE")?.click();
 					break;
 				}
 
 				case "Numpad7": {
-					this.addToSet(this.SETS.SAFE);
+					this.addToSet(this.SETS.EXPLICIT);
 					break;
 				}
 
@@ -317,7 +317,7 @@ class E621Utilities {
 				}
 
 				case "Numpad9": {
-					this.addToSet(this.SETS.EXPLICIT);
+					this.addToSet(this.SETS.SAFE);
 					break;
 				}
 
