@@ -306,17 +306,17 @@ class E621Utilities {
 					break;
 				}
 
-				case "Numbpad7": {
+				case "Numpad7": {
 					this.addToSet(this.SETS.SAFE);
 					break;
 				}
 
-				case "Numbpad8": {
+				case "Numpad8": {
 					this.addToSet(this.SETS.QUESTIONABLE);
 					break;
 				}
 
-				case "Numbpad9": {
+				case "Numpad9": {
 					this.addToSet(this.SETS.EXPLICIT);
 					break;
 				}
