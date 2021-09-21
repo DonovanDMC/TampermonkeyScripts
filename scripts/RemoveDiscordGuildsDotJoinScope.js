@@ -13,5 +13,5 @@
 
 const query = window.location.search.slice(1).split("&").map(v => ({ [v.split("=")[0]]: v.split("=")[1] })).reduce((a, b) => ({ ...a, ...b }), {});
 const o = String(query.scope);
-query.scope = decodeURIComponent(query.scope).split(" ").filter(j => j !== "guilds.join").join(query.scope.indexOf("+") !== -1 ? "+" : "%20");
+query.scope = decodeURIComponent(query.scope.replace(/\+/g, "%20")).split(" ").filter(j => j !== "guilds.join").join(query.scope.indexOf("+") !== -1 ? "+" : "%20");
 if (o !== query.scope) window.location.href = `${window.location.pathname}?${Object.entries(query).map(([a, b]) => `${a}=${b}`).join("&")}`;

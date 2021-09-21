@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RE621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.44
+// @version      1.0.46
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -30,7 +30,9 @@ class E621Utilities {
 	static SETS = {
 		SAFE: 27220,
 		QUESTIONABLE: 27221,
-		EXPLICIT: 27222
+		EXPLICIT: 27222,
+		BALLSBALLSOUTLINE: 27956,
+		PENISPENISOUTLINE: 27957
 	};
 	static load() {
 		if (this.DONE === true) return;
@@ -45,20 +47,39 @@ class E621Utilities {
 				// setTimeout(this.checkEmptyPosts.bind(this), 1e3);
 				this.addPostCounts();
 			}), 1e3);
-			setInterval(() => {
+			setInterval(async () => {
+				const list = await this.getHideList();
 				document.querySelectorAll("post-break").forEach((b) => {
-					if (!this.BREAKS.includes(b.id)) {
-						this.BREAKS.push(b.id);
-						setTimeout(() => this.getHideList().then(v => {
-							this.hidePosts([...v.hidden, ...this.HIDE_LIST]);
-							this.markLockedPosts(v.locked);
-							// setTimeout(this.checkEmptyPosts.bind(this), 1e3);
-							this.addPostCounts();
-						}), 1e3);
-					}
-				}, 500);
+					if (this.BREAKS.includes(b.id)) return;
+					this.BREAKS.push(b.id);
+					setTimeout(() => {
+						this.hidePosts([...list.hidden, ...this.HIDE_LIST]);
+						this.markLockedPosts(list.locked);
+						// setTimeout(this.checkEmptyPosts.bind(this), 1e3);
+						this.addPostCounts();
+					}, 1e3);
+				});
 
-			});
+				const posts = this.getElement("NOTIFICATION_POSTS");
+				for (const p of posts) {
+					if (list.hidden.includes(Number(p.dataset.id)) && p.dataset.processed !== "1") {
+						if (!p.querySelector("img")) continue;
+						p.dataset.processed = "1";
+						p.style.backgroundColor = "purple";
+						p.querySelector("img").style.display = "none";
+						p.addEventListener("mouseenter", () => p.querySelector("img").style.display = "");
+						p.addEventListener("mouseleave", () => p.querySelector("img").style.display = "none");
+					} else {
+						p.addEventListener("auxclick", (e) => {
+							console.log("aux", e, e.button);
+							if (e.button !== 1) return;
+							this.markChecked(Number(p.dataset.id));
+							p.style.backgroundColor = "purple";
+							p.querySelector("img").style.display = "none";
+						});
+					}
+				}
+			}, 500);
 		}
 		if (this.REGEX.POST.test(window.location.pathname)) {
 			this.setupQuickEdit();
@@ -102,6 +123,8 @@ class E621Utilities {
 			case "PAGINATOR": return document.querySelector("paginator");
 			case "FILE": return document.querySelector("div#section-file").querySelector("input[type=text]");
 			case "CHECK": return Array.from(document.querySelectorAll(".pv-post.pv-content"));
+			case "NOTIFICATIONS": return document.querySelector("div[aria-describedby=ui-id-22][aria-labelledby=ui-id-23]");
+			case "NOTIFICATION_POSTS": return this.getElement("NOTIFICATIONS").querySelectorAll("sb-ctwrap>sb-canvas>subitem");
 			default: return;
 		}
 	}
@@ -118,7 +141,7 @@ class E621Utilities {
 	}
 
 	static addNotes() {
-		if (this.REGEX.POST_LIST.test(window.location.pathname)) {
+		if (this.REGEX.POST_LIST.test(window.location.pathname) || window.location.pathname === "/post_versions") {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="open"><a href="javascript:E621Utilities.openAllPosts()">Open All Posts</a></li>';
 		}
@@ -206,42 +229,43 @@ class E621Utilities {
 			switch (ev.code) {
 				case "Digit1": {
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
-					this.setEditReason("Explicit bulge.");
+					this.setEditReason("Detailed bulge.");
+					this.addTags("detailed_bulge");
 					break;
 				}
 
 				case "Digit2": {
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
 					this.setEditReason("Penis outline.");
-					this.addTags("penis_outline");
+					this.addTags("penis_outline", "detailed_bulge");
 					break;
 				}
 
 				case "Digit3": {
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
 					this.setEditReason("Balls outline.");
-					this.addTags("balls_outline");
+					this.addTags("balls_outline", "detailed_bulge");
 					break;
 				}
 
 				case "Digit4": {
-					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+					this.manuallyTriggerQuickEdit(2);
+					this.manuallyTriggerQuickEdit(3);
 					this.setEditReason("Balls & penis outline.");
-					this.addTags("balls_outline", "penis_outline");
 					break;
 				}
 
 				case "Digit5": {
 					this.setEditReason("Penis is not immediately visible.");
 					this.removeTags("diphallism", "flaccid", "poking_out", "half-erect", "cock_ring", "hemipenes", "multi_penis");
-					this.removeTagsFilter((t) => ["penis", "genital", "knot", "foreskin", "uncut", "circumcised", "in_panties"].some(v => t.indexOf(v) !== -1) && ["outline"].some(v => t.indexOf(v) === -1));
+					this.removeTagsFilter((t) => ["penis", "genital", "knot", "foreskin", "uncut", "circumcised"].some(v => t.includes(v)) && !["outline", "in_panties", "in_underwear"].some(v => t.includes(v)));
 					break;
 				}
 
 				case "Digit6": {
 					this.setEditReason("Balls are not immediately visible.");
 					this.removeTags("backsack", "ball_fondling");
-					this.removeTagsFilter((t) => ["balls", "genital", "in_panties"].some(v => t.indexOf(v) !== -1) && ["outline"].some(v => t.indexOf(v) === -1));
+					this.removeTagsFilter((t) => ["balls", "genital"].some(v => t.includes(v)) && !["outline", "in_panties", "in_underwear"].some(v => t.includes(v)));
 					break;
 				}
 
@@ -306,6 +330,23 @@ class E621Utilities {
 					break;
 				}
 
+				case "Numpad4": {
+					this.addToSet(this.SETS.BALLSBALLSOUTLINE);
+					break;
+				}
+
+				case "Numpad6": {
+					this.addToSet(this.SETS.PENISPENISOUTLINE);
+					break;
+				}
+
+				/* case "Numpad4": {
+					this.setEditReason("watersports");
+					this.addTags("watersports");
+					this.getElement("EXPLICIT")?.click();
+					break;
+				} */
+
 				case "Numpad7": {
 					this.addToSet(this.SETS.EXPLICIT);
 					break;
@@ -334,7 +375,6 @@ class E621Utilities {
 				default: return;
 			}
 		});
-
 		document.addEventListener("keyup", () => {
 			//const tt = t.value.split("\n").map(v => v.split(" ").filter(v => !["1", "2", "3"].includes(v)).join(" ")).join("\n");
 			if (["1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(this.getElement("PARENT_ID").value)) this.getElement("PARENT_ID").value = "";
@@ -342,40 +382,71 @@ class E621Utilities {
 		});
 	}
 
-	static async openAllPosts() {
-		const p = this.getElement("POSTS");
-		for (const e of p) {
-			if (e.dataset.locked === "true" || e.dataset.done === "true") continue;
-			const w = window.open(`/posts/${e.id.split("_")[1]}?current=${this.getElement("POSTS").indexOf(e) + 1}&total=${this.getElement("POSTS").length}`);
-			w.blur();
-			window.focus();
-			await new Promise((a, b) => {
-				window.openTimeout = setTimeout(a, 5e3);
-				w.addEventListener("load", () => {
-					clearTimeout(window.openTimeout);
-					a();
+	static get openEveryPost() { return this.openAllPosts(true, true); }
+
+	static async openAllPosts(ignoreLock = true, ignoreDone = false) {
+		if (window.location.pathname === "/post_versions") {
+			const p = Array.from(document.querySelectorAll("div[id^=post-version-]")).filter(v => !v.dataset.status);
+			const d = [];
+			for (const e of p) {
+				if (!ignoreLock && e.dataset.locked === "true" || !ignoreDone && e.dataset.done === "true") continue;
+				const id = Number(e.dataset.postId);
+				if (d.includes(id)) continue;
+				d.push(id);
+				window.curId = id;
+				this.markChecked(id);
+				const w = window.open(`/posts/${id}?current=${p.indexOf(e) + 1}&total=${p.length}`);
+				w.blur();
+				window.focus();
+				await new Promise((a, b) => {
+					window.openTimeout = setTimeout(a, 5e3);
+					w.addEventListener("load", () => {
+						clearTimeout(window.openTimeout);
+						a();
+					});
 				});
-			});
-			delete window.openTimeout;
+				delete window.openTimeout;
+			}
+		} else {
+			const p = this.getElement("POSTS");
+			for (const e of p) {
+				if (ignore && e.dataset.locked === "true" || e.dataset.done === "true") continue;
+				const w = window.open(`/posts/${e.id.split("_")[1]}?current=${p.indexOf(e) + 1}&total=${p.length}`);
+				w.blur();
+				window.focus();
+				await new Promise((a, b) => {
+					window.openTimeout = setTimeout(a, 5e3);
+					w.addEventListener("load", () => {
+						clearTimeout(window.openTimeout);
+						a();
+					});
+				});
+				delete window.openTimeout;
+			}
 		}
 	}
 
 	static checkTagLockNSFW() {
 		const tags = this.getTags();
+		if (document.querySelector("section#edit").innerHTML.indexOf("This post is rating locked.") !== -1) return;
 		const lockTags = [
 			"balls",
 			"penis",
 			"sheath",
 			"genitals",
+			"pussy",
+			"perineum",
 
 			"balls_outline",
 			"penis_outline",
 			"sheath_outline",
 			"genital_outline",
+			"detailed_bulge",
 
 			"bulge_frottage",
 			"masturbation",
-			"sex_toy"
+			"sex_toy",
+			"sex"
 		];
 		for (const t of lockTags) {
 			if (tags.includes(t)) {
@@ -461,7 +532,7 @@ class E621Utilities {
 		const c = force || confirm("Are you sure you want to hide this post?");
 		if (c === false) return alert("Cancelled.");
 		else {
-			const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1];
+			const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1] || (window.location.pathname === "/post_versions" && window.curId);
 			if (!id) return alert("error.3");
 			// padding isn't required, and it's easier to just toss it out
 			return fetch(`${this.BASE}${encodeURIComponent(btoa("no-tags").replace(/=/g, ""))}/${id}`, {
@@ -482,13 +553,19 @@ class E621Utilities {
 			for (const v of c) {
 				const j = v.querySelector("a");
 				const id = Number(j.href.split("/posts/")[1]);
-				if (locked.includes(id)) v.parentNode.style.border = "2px solid red";
-				else if (l.includes(id)) v.parentNode.style.border = "2px solid purple";
+				if (locked.includes(id)) {
+					v.parentNode.dataset.locked = "true";
+					v.parentNode.style.backgroundColor = "lightred";
+				}
+				else if (l.includes(id)) {
+					v.parentNode.dataset.done = "true";
+					v.parentNode.style.backgroundColor = "lightpink";
+				}
 				else {
 					v.addEventListener("auxclick", (e) => {
 						if (e.button !== 1) return;
 						this.markChecked(id);
-						v.parentNode.style.border = "2px solid purple";
+						v.parentNode.style.backgroundColor = "lightpink";
 					});
 				}
 			}
@@ -557,17 +634,18 @@ class E621Utilities {
 	}
 
 	static getPostId() {
-		return Danbooru.Post.currentPost().id ?? undefined;
+		return Danbooru.Post.currentPost().id ?? window.curId ?? undefined;
 	}
 
 	static markLocked() {
 		const id = this.getPostId();
-		if (!id) return alert("error.3");
+		if (!id) return alert("error.4");
 		return fetch(`${this.BASE}locked/${id}`, {
 			method: "PUT"
 		}).then(res => {
 			if (res.status !== 204) return alert("non-204");
 			alert("Done, locked.");
+			window.curId = undefined;
 		}).catch(alert);
 	}
 
@@ -584,7 +662,7 @@ class E621Utilities {
 			const b = document.querySelector("#add-to-set-id");
 			b.value = String(id);
 			document.querySelector("#add-to-set-submit").click();
-		}, 250);
+		}, 750);
 		/* return fetch(`https://e621.net/post_sets/${id}/add_posts.json`, {
 			method: "POST",
 			headers: {
@@ -608,4 +686,4 @@ document.addEventListener("DOMContentLoaded", () => {
 	setTimeout(() => {
 		if (document.hidden === false) E621Utilities.load();
 	}, 500);
-});;
+});
