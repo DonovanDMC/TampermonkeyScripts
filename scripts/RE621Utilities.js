@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RE621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.46
+// @version      1.0.47
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/*
@@ -382,7 +382,7 @@ class E621Utilities {
 		});
 	}
 
-	static get openEveryPost() { return this.openAllPosts(true, true); }
+	static get openEveryPost() { return E621Utilities.openAllPosts.bind(E621Utilities, true, true); }
 
 	static async openAllPosts(ignoreLock = true, ignoreDone = false) {
 		if (window.location.pathname === "/post_versions") {
@@ -410,7 +410,7 @@ class E621Utilities {
 		} else {
 			const p = this.getElement("POSTS");
 			for (const e of p) {
-				if (ignore && e.dataset.locked === "true" || e.dataset.done === "true") continue;
+				if (!ignoreLock && e.dataset.locked === "true" || !ignoreDone && e.dataset.done === "true") continue;
 				const w = window.open(`/posts/${e.id.split("_")[1]}?current=${p.indexOf(e) + 1}&total=${p.length}`);
 				w.blur();
 				window.focus();
