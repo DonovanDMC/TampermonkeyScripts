@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RE621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.48
+// @version      1.0.49
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/posts/*
@@ -227,28 +227,25 @@ class E621Utilities {
 			if (ev.shiftKey) return;
 			switch (ev.code) {
 				case "Digit1": {
-					if (this.getRating() !== "e") {
-						this.getElement("EXPLICIT")?.click();
-						document.querySelector("[name='post[is_rating_locked]'][value='1']")?.click();
-					}
+                    const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
+					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+                    if(!rl?.clicked) rl?.click();
 					this.addTags("detailed_bulge");
 					break;
 				}
 
 				case "Digit2": {
-					if (this.getRating() !== "e") {
-						this.getElement("EXPLICIT")?.click();
-						document.querySelector("[name='post[is_rating_locked]'][value='1']")?.click();
-					}
+                    const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
+					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+                    if(!rl?.clicked) rl?.click();
 					this.addTags("penis_outline", "detailed_bulge");
 					break;
 				}
 
 				case "Digit3": {
-					if (this.getRating() !== "e") {
-						this.getElement("EXPLICIT")?.click();
-						document.querySelector("[name='post[is_rating_locked]'][value='1']")?.click();
-					}
+                    const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
+					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+                    if(!rl?.clicked) rl?.click();
 					this.addTags("balls_outline", "detailed_bulge");
 					break;
 				}
@@ -293,7 +290,10 @@ class E621Utilities {
 				}
 
 				case "Digit0": {
-					this.removeTagsFilter((t) => ["anus"].some(v => t.indexOf(v) !== -1));
+					this.setEditReason("bdsm toys are explicit");
+                    const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
+					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+                    if(!rl?.clicked) rl?.click();
 					break;
 				}
 
