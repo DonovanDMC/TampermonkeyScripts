@@ -15,7 +15,6 @@
 
 class E621Utilities {
 	static POSTS_PER_PAGE = 75;
-	static HIDE_LIST = [];
 	static DONE = false;
 	static KEYBINDS_DISABLED = false;
 	static HIDDEN = 0;
@@ -39,47 +38,6 @@ class E621Utilities {
 		this.handle503();
 		this.addLoaded();
 		this.addNotes();
-		if (this.REGEX.POST_LIST.test(window.location.pathname)) {
-			/*setTimeout(() => this.getHideList().then(v => {
-				this.hidePosts([...v.hidden, ...this.HIDE_LIST]);
-				this.markLockedPosts(v.locked);
-				// setTimeout(this.checkEmptyPosts.bind(this), 1e3);
-				this.addPostCounts();
-			}), 1e3);*/
-			setInterval(async () => {
-				const list = {hidden:[],locked:[]}; // await this.getHideList();
-				document.querySelectorAll("post-break").forEach((b) => {
-					if (this.BREAKS.includes(b.id)) return;
-					this.BREAKS.push(b.id);
-					setTimeout(() => {
-						this.hidePosts([...list.hidden, ...this.HIDE_LIST]);
-						this.markLockedPosts(list.locked);
-						// setTimeout(this.checkEmptyPosts.bind(this), 1e3);
-						this.addPostCounts();
-					}, 1e3);
-				});
-
-				const posts = this.getElement("NOTIFICATION_POSTS");
-				for (const p of posts) {
-					if (list.hidden.includes(Number(p.dataset.id)) && p.dataset.processed !== "1") {
-						if (!p.querySelector("img")) continue;
-						p.dataset.processed = "1";
-						p.style.backgroundColor = "purple";
-						p.querySelector("img").style.display = "none";
-						p.addEventListener("mouseenter", () => p.querySelector("img").style.display = "");
-						p.addEventListener("mouseleave", () => p.querySelector("img").style.display = "none");
-					} else {
-						p.addEventListener("auxclick", (e) => {
-							console.log("aux", e, e.button);
-							if (e.button !== 1) return;
-							this.markChecked(Number(p.dataset.id));
-							p.style.backgroundColor = "purple";
-							p.querySelector("img").style.display = "none";
-						});
-					}
-				}
-			}, 500);
-		}
 		if (this.REGEX.POST.test(window.location.pathname)) {
 			this.setupQuickEdit();
 			this.collapseTags();
@@ -89,9 +47,6 @@ class E621Utilities {
 		}
 		if (this.REGEX.UPLOAD.test(window.location.pathname)) setInterval(this.fixTwitterFileUrl.bind(this), 500);
 		if (this.REGEX.EDIT_USER.test(window.location.pathname)) this.resizeAbout();
-		setTimeout(() => {
-			this.setupChecked();
-		});
 		this.DONE = true;
 	}
 
@@ -144,72 +99,6 @@ class E621Utilities {
 			this.getElement("MENU").innerHTML += '<li>|</li>';
 			this.getElement("MENU").innerHTML += '<li id="open"><a href="javascript:E621Utilities.openAllPosts()">Open All Posts</a></li>';
 		}
-
-		if (this.REGEX.POST.test(window.location.pathname)) {
-			// remove useless links
-			this.getElement("MENU").removeChild(document.querySelector("nav#nav menu li#subnav-hot"));
-			this.getElement("MENU").removeChild(document.querySelector("nav#nav menu li#subnav-popular"));
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.hide(true)">Hide Post</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="hide-post"><a href="javascript:E621Utilities.toggleQuickEdits()">QE: <span id="t">Enabled</span></a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-1"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(1)">1 - Explicit Bulge</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-2"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(2)">2 - Penis Outline</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(3)">3 - Balls Outline</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-3"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(4)">4 - 2 & 3</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-5"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(5)">5 - Penis nv</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-6"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(6)">6 - Balls nv</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-7"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(7)">7 - 5 & 6</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="digit-8"><a href="javascript:E621Utilities.manuallyTriggerQuickEdit(8)">8 - NB</a></li>';
-			this.getElement("MENU").innerHTML += '<li>|</li>';
-			this.getElement("MENU").innerHTML += '<li id="locked"><a href="javascript:E621Utilities.markLocked()">Lock</a></li>';
-		}
-	}
-
-	static hidePosts(p) {
-		for (const h of p) {
-			const e = document.querySelector(`post#entry_${h}`);
-			if (e) {
-				e.dataset.done = "true";
-				this.HIDDEN++;
-				e.style.border = "3px solid yellow";
-			}
-		}
-	}
-
-	static markLockedPosts(p) {
-		for (const h of p) {
-			const e = document.querySelector(`post#entry_${h}`);
-			if (e) {
-				e.dataset.locked = "true";
-				e.style.border = "3px solid red";
-			}
-		}
-	}
-
-	static addPostCounts() {
-		const p = this.getPage();
-		const prev = this.POSTS_PER_PAGE * (p - 1);
-		const cur = this.getElement("POSTS").length;
-		const next = Number(Array.from(this.getElement("PAGINATOR").querySelectorAll("div.paginator-numbers a")).slice(-1)[0]?.innerText ?? 1) - p;
-		const pag = this.POSTS_PER_PAGE * next;
-		this.getElement("MENU").innerHTML += '<li>|</li>';
-		this.getElement("MENU").innerHTML += `<li id="previous-posts"><a href="javascript:void(0)">${prev} Previous Post${prev === 1 ? "" : "s"} (${(p - 1)} Page${(p - 1) === 1 ? "" : "s"})</a></li>`;
-		this.getElement("MENU").innerHTML += '<li>|</li>';
-		this.getElement("MENU").innerHTML += `<li id="current-posts"><a href="javascript:void(0)">${cur} Current Post${cur === 1 ? "" : "s"}</a></li>`;
-		this.getElement("MENU").innerHTML += '<li>|</li>';
-		this.getElement("MENU").innerHTML += `<li id="hidden-posts"><a href="javascript:void(0)">${this.HIDDEN} Done Post${this.HIDDEN === 1 ? "" : "s"}</a></li>`;
-		this.getElement("MENU").innerHTML += '<li>|</li>';
-		this.getElement("MENU").innerHTML += `<li id="next-posts"><a href="javascript:void(0)">${pag} Next Post${pag === 1 ? "" : "s"} (${next} Page${(next - 1) === 1 ? "" : "s"})</a></li>`;
-
 	}
 
 	static collapseTags() {
@@ -291,10 +180,10 @@ class E621Utilities {
 
 				case "Digit0": {
 					this.setEditReason("bdsm toys are explicit");
-                    const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
+                   			const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
-                    if(!rl?.clicked) rl?.click();
-                    this.addTags(`set:${this.SETS.EXPLICIT}`);
+                   			if(!rl?.clicked) rl?.click();
+                   			this.addTags(`set:${this.SETS.EXPLICIT}`);
 					setTimeout(() => document.querySelector("div.edit-submit.input input[name=commit]").click(), 250);
 					break;
 				}
@@ -383,12 +272,11 @@ class E621Utilities {
 
 	static get openEveryPost() { return E621Utilities.openAllPosts.bind(E621Utilities, true, true); }
 
-	static async openAllPosts(ignoreLock = true, ignoreDone = false) {
+	static async openAllPosts() {
 		if (window.location.pathname === "/post_versions") {
 			const p = Array.from(document.querySelectorAll("div[id^=post-version-]")).filter(v => !v.dataset.status);
 			const d = [];
 			for (const e of p) {
-				if (!ignoreLock && e.dataset.locked === "true" || !ignoreDone && e.dataset.done === "true") continue;
 				const id = Number(e.dataset.postId);
 				if (d.includes(id)) continue;
 				d.push(id);
@@ -407,9 +295,8 @@ class E621Utilities {
 				delete window.openTimeout;
 			}
 		} else {
-			const p = this.getElement("POSTS");
+			const p = Array.from(document.querySelectorAll("article.post-preview"));
 			for (const e of p) {
-				if (!ignoreLock && e.dataset.locked === "true" || !ignoreDone && e.dataset.done === "true") continue;
 				const w = window.open(`/posts/${e.id.split("_")[1]}?current=${p.indexOf(e) + 1}&total=${p.length}`);
 				w.blur();
 				window.focus();
@@ -508,88 +395,6 @@ class E621Utilities {
 		this.openEditMode();
 		const code = /^[0-9]$/.test(e) ? `Digit${e}` : e;
 		document.dispatchEvent(new KeyboardEvent("keydown", { code }));
-	}
-
-	/**
-	 * @param {string} [t]
-	 * @returns {Promise<{ hidden: number[]; locked: number[]; } | number[]>}
-	 */
-	static async getHideList(t) {
-		return fetch(`${this.BASE}${t ?? ""}`, {
-			method: "GET"
-		}).then(res => {
-			if (res.status !== 200) {
-				if (res.status === 404) return;
-				alert("non-200/404");
-			} else return res.json();
-			// this.hidePosts()
-		}).catch(alert);
-
-	}
-
-	static async hide(force = false) {
-		const c = force || confirm("Are you sure you want to hide this post?");
-		if (c === false) return alert("Cancelled.");
-		else {
-			const id = window.location.pathname.match(/\/posts\/([0-9]{2,})/)?.[1] || (window.location.pathname === "/post_versions" && window.curId);
-			if (!id) return alert("error.3");
-			// padding isn't required, and it's easier to just toss it out
-			return fetch(`${this.BASE}${encodeURIComponent(btoa("no-tags").replace(/=/g, ""))}/${id}`, {
-				method: "PUT"
-			}).then(res => {
-				if (res.status !== 204) return alert("non-204");
-				alert("Done, hidden.");
-			}).catch(alert);
-		}
-	}
-
-	static async setupChecked() {
-		const l = await this.getHideList("ver");
-
-		if (window.location.pathname === "/post_versions") {
-			const { locked } = await this.getHideList();
-			const c = this.getElement("CHECK");
-			for (const v of c) {
-				const j = v.querySelector("a");
-				const id = Number(j.href.split("/posts/")[1]);
-				if (locked.includes(id)) {
-					v.parentNode.dataset.locked = "true";
-					v.parentNode.style.backgroundColor = "lightred";
-				}
-				else if (l.includes(id)) {
-					v.parentNode.dataset.done = "true";
-					v.parentNode.style.backgroundColor = "lightpink";
-				}
-				else {
-					v.addEventListener("auxclick", (e) => {
-						if (e.button !== 1) return;
-						this.markChecked(id);
-						v.parentNode.style.backgroundColor = "lightpink";
-					});
-				}
-			}
-		} else if (window.location.pathname === "/posts") {
-			const c = this.getElement("POSTS");
-			for (const v of c) {
-				const id = Number(v.id.split("_")[1]);
-				if (l.includes(id) && v.style.border === undefined) v.style.border = "3px solid purple";
-				else {
-					v.addEventListener("auxclick", (e) => {
-						if (e.button !== 1) return;
-						this.markChecked(id);
-						v.style.border = "3px solid purple";
-					});
-				}
-			}
-		}
-	}
-
-	static async markChecked(id) {
-		return fetch(`${this.BASE}ver/${id}`, {
-			method: "PUT"
-		}).then(res => {
-			if (res.status !== 204) return alert("non-204");
-		}).catch(alert);
 	}
 
 	static enforceConsistentSpacing() {
