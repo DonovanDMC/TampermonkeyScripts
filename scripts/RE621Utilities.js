@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RE621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.49
+// @version      1.0.50
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
 // @match        https://e621.net/posts*
@@ -47,7 +47,7 @@ class E621Utilities {
 				this.addPostCounts();
 			}), 1e3);*/
 			setInterval(async () => {
-				const list = []; // await this.getHideList();
+				const list = {hidden:[],locked:[]}; // await this.getHideList();
 				document.querySelectorAll("post-break").forEach((b) => {
 					if (this.BREAKS.includes(b.id)) return;
 					this.BREAKS.push(b.id);
@@ -294,8 +294,8 @@ class E621Utilities {
                     const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
                     if(!rl?.clicked) rl?.click();
-					this.addToSet(this.SETS.EXPLICIT);
-					setTimeout(() => document.querySelector("div.edit-submit.input input[name=commit]").click(), 1250);
+                    this.addTags(`set:${this.SETS.EXPLICIT}`);
+					setTimeout(() => document.querySelector("div.edit-submit.input input[name=commit]").click(), 250);
 					break;
 				}
 
