@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         RE621 Utilities
 // @namespace    http://tampermonkey.net/
-// @version      1.0.47
+// @version      1.0.48
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
-// @match        https://e621.net/*
+// @match        https://e621.net/posts/*
 // @icon         https://www.google.com/s2/favicons?domain=e621.net
 // @grant        none
 // @updateURL    https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/RE621Utilities.js
@@ -14,7 +14,6 @@
 
 
 class E621Utilities {
-	static BASE = "https://hide.e621.net/";
 	static POSTS_PER_PAGE = 75;
 	static HIDE_LIST = [];
 	static DONE = false;
@@ -41,14 +40,14 @@ class E621Utilities {
 		this.addLoaded();
 		this.addNotes();
 		if (this.REGEX.POST_LIST.test(window.location.pathname)) {
-			setTimeout(() => this.getHideList().then(v => {
+			/*setTimeout(() => this.getHideList().then(v => {
 				this.hidePosts([...v.hidden, ...this.HIDE_LIST]);
 				this.markLockedPosts(v.locked);
 				// setTimeout(this.checkEmptyPosts.bind(this), 1e3);
 				this.addPostCounts();
-			}), 1e3);
+			}), 1e3);*/
 			setInterval(async () => {
-				const list = await this.getHideList();
+				const list = []; // await this.getHideList();
 				document.querySelectorAll("post-break").forEach((b) => {
 					if (this.BREAKS.includes(b.id)) return;
 					this.BREAKS.push(b.id);
@@ -228,19 +227,28 @@ class E621Utilities {
 			if (ev.shiftKey) return;
 			switch (ev.code) {
 				case "Digit1": {
-					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+					if (this.getRating() !== "e") {
+						this.getElement("EXPLICIT")?.click();
+						document.querySelector("[name='post[is_rating_locked]'][value='1']")?.click();
+					}
 					this.addTags("detailed_bulge");
 					break;
 				}
 
 				case "Digit2": {
-					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+					if (this.getRating() !== "e") {
+						this.getElement("EXPLICIT")?.click();
+						document.querySelector("[name='post[is_rating_locked]'][value='1']")?.click();
+					}
 					this.addTags("penis_outline", "detailed_bulge");
 					break;
 				}
 
 				case "Digit3": {
-					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
+					if (this.getRating() !== "e") {
+						this.getElement("EXPLICIT")?.click();
+						document.querySelector("[name='post[is_rating_locked]'][value='1']")?.click();
+					}
 					this.addTags("balls_outline", "detailed_bulge");
 					break;
 				}
