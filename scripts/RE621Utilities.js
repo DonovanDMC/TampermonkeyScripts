@@ -180,10 +180,10 @@ class E621Utilities {
 
 				case "Digit0": {
 					this.setEditReason("bdsm toys are explicit");
-                   			const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
+                    const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
-                   			if(!rl?.clicked) rl?.click();
-                   			this.addTags(`set:${this.SETS.EXPLICIT}`);
+                   	if(!rl?.clicked) rl?.click();
+                   	this.addTagsFromStart(`set:${this.SETS.EXPLICIT}`);
 					setTimeout(() => document.querySelector("div.edit-submit.input input[name=commit]").click(), 250);
 					break;
 				}
@@ -389,6 +389,10 @@ class E621Utilities {
 	/** @param {Array<string>} tags */
 	static addTags(...tags) {
 		this.getElement("TAGS").value = [...this.getElement("TAGS").value.split("\n"), tags.join(" ")].join("\n");
+	}
+
+    static addTagsFromStart(...tags) {
+		this.getElement("TAGS").value = [tags.join(" "), ...this.getElement("TAGS").value.split("\n")].join("\n");
 	}
 
 	static manuallyTriggerQuickEdit(e) {
