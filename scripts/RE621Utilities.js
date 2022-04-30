@@ -4,7 +4,7 @@
 // @version      1.0.49
 // @description  My various utilities for e621.
 // @author       Donovan_DMC
-// @match        https://e621.net/posts/*
+// @match        https://e621.net/posts*
 // @icon         https://www.google.com/s2/favicons?domain=e621.net
 // @grant        none
 // @updateURL    https://raw.githubusercontent.com/DonovanDMC/TampermonkeyScripts/master/scripts/RE621Utilities.js
@@ -294,6 +294,8 @@ class E621Utilities {
                     const rl = document.querySelector("[name='post[is_rating_locked]'][value='1']");
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
                     if(!rl?.clicked) rl?.click();
+					this.addToSet(this.SETS.EXPLICIT);
+					setTimeout(() => document.querySelector("div.edit-submit.input input[name=commit]").click(), 1250);
 					break;
 				}
 
