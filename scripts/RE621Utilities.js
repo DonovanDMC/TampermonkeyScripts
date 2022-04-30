@@ -229,21 +229,18 @@ class E621Utilities {
 			switch (ev.code) {
 				case "Digit1": {
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
-					this.setEditReason("Detailed bulge.");
 					this.addTags("detailed_bulge");
 					break;
 				}
 
 				case "Digit2": {
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
-					this.setEditReason("Penis outline.");
 					this.addTags("penis_outline", "detailed_bulge");
 					break;
 				}
 
 				case "Digit3": {
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
-					this.setEditReason("Balls outline.");
 					this.addTags("balls_outline", "detailed_bulge");
 					break;
 				}
@@ -251,19 +248,16 @@ class E621Utilities {
 				case "Digit4": {
 					this.manuallyTriggerQuickEdit(2);
 					this.manuallyTriggerQuickEdit(3);
-					this.setEditReason("Balls & penis outline.");
 					break;
 				}
 
 				case "Digit5": {
-					this.setEditReason("Penis is not immediately visible.");
 					this.removeTags("diphallism", "flaccid", "poking_out", "half-erect", "cock_ring", "hemipenes", "multi_penis");
 					this.removeTagsFilter((t) => ["penis", "genital", "knot", "foreskin", "uncut", "circumcised"].some(v => t.includes(v)) && !["outline", "in_panties", "in_underwear"].some(v => t.includes(v)));
 					break;
 				}
 
 				case "Digit6": {
-					this.setEditReason("Balls are not immediately visible.");
 					this.removeTags("backsack", "ball_fondling");
 					this.removeTagsFilter((t) => ["balls", "genital"].some(v => t.includes(v)) && !["outline", "in_panties", "in_underwear"].some(v => t.includes(v)));
 					break;
@@ -272,19 +266,16 @@ class E621Utilities {
 				case "Digit7": {
 					this.manuallyTriggerQuickEdit(5);
 					this.manuallyTriggerQuickEdit(6);
-					this.setEditReason("Penis & balls are not immediately visible.");
 					break;
 				}
 
 				case "Digit8": {
-					this.setEditReason("There is not a penis (clothing) bulge present.");
 					this.removeTags("penis_outline", "balls_outline", "genital_outline");
 					this.removeTagsFilter((t) => ["bulge", "penis_shaped_bulge"].some(v => t.indexOf(v) !== -1) && ["abdominal"].some(v => t.indexOf(v) === -1));
 					break;
 				}
 
 				case "Digit9": {
-					this.setEditReason("There are no directly visible genitals.");
 					this.removeTagsFilter((t) =>
 						["genital"].some(v => t.indexOf(v) !== -1) &&
 						["outline", "genital_fluids"].some(v => t.indexOf(v) === -1)
@@ -294,7 +285,6 @@ class E621Utilities {
 				}
 
 				case "Digit0": {
-					this.setEditReason("Anus is not immediately visible.");
 					this.removeTagsFilter((t) => ["anus"].some(v => t.indexOf(v) !== -1));
 					break;
 				}
@@ -311,7 +301,6 @@ class E621Utilities {
 
 				case "Numpad5": {
 					if (this.getRating() !== "e") this.getElement("EXPLICIT")?.click();
-					this.setEditReason("Sex toys are always explicit.");
 					break;
 				}
 
